@@ -156,6 +156,41 @@ class TornadoInstaller:
         ## Update env-variables
         self.env["PATH"].append(os.path.join(mavenTLD, "bin"))
 
+    def downloadJavaFX(self):
+        url = config.JAVAFX[self.osPlatform][self.hardware]
+        if url == None:
+            print("JavaFX not configured for this OS/ machine configuration: {self.osPlatform}/ {self.hardware}")
+            sys.exit(0)
+
+        fileName = self.processFileName(url)
+        print("\nChecking dependency: " + fileName)
+        fullPath = os.path.join(self.workDirName, fileName)
+
+        if not os.path.exists(fullPath):
+            wget.download(url, fullPath)
+
+        ## Uncompress file
+        try:
+            if os.name == 'nt':
+                ar = zipfile.ZipFile(fullPath, 'r')
+                javafxTLD = os.path.join(self.getCurrentDirectory(), self.workDirName, self.getTLDName(ar))
+                if not os.path.exists(javafxTLD):
+                    ar.extractall(self.workDirName)
+            else:
+                ar = tarfile.open(fullPath, "r:gz")
+                javafxTLD = os.path.join(self.getCurrentDirectory(), self.workDirName, self.getTLDName(ar))
+                if not os.path.exists(javafxTLD):
+                    ar.extractall(self.workDirName, numeric_owner=True)
+        except:
+            print(f"Unpacking failed for JavaFX {url}")
+            sys.exit(0)
+
+        ar.close()
+
+        ## Update env-variables
+        #self.env["PATH"].append(os.path.join(javafxTLD, "bin"))
+        self.env["PATH_TO_FX"] = os.path.join(javafxTLD, "lib")
+
     def getTLDName(self, ar):
         if os.name == 'nt':
             extractedNames = ar.namelist()[1].split("/")
@@ -227,6 +262,9 @@ class TornadoInstaller:
         ## 3. TORNADO_SDK
         os.environ["TORNADO_SDK"] = self.env["TORNADO_SDK"]
 
+        ## 4. JAVA_FX
+        os.environ["PATH_TO_FX"] = self.env["PATH_TO_FX"]
+
     def compileTornadoVM(self, makeJDK, backend, polyglotOption):
         if os.name == 'nt':
             command = "nmake /f Makefile.mak " + makeJDK + " " + backend + " " + polyglotOption
@@ -254,6 +292,9 @@ class TornadoInstaller:
             fileContent = (
                     fileContent + "set TORNADO_SDK=" + os.environ["TORNADO_SDK"] + "\n"
             )
+            fileContent = (
+                    fileContent + "set PATH_TO_FX=" + os.environ["PATH_TO_FX"] + "\n"
+            )
             f = open("setvars.cmd", "w")
             f.write(fileContent)
             f.close()
@@ -267,6 +308,9 @@ class TornadoInstaller:
             fileContent = fileContent + "export PATH=" + allPaths + "$PATH" + "\n"
             fileContent = (
                     fileContent + "export TORNADO_SDK=" + os.environ["TORNADO_SDK"] + "\n"
+            )
+            fileContent = (
+                    fileContent + "export PATH_TO_FX=" + os.environ["PATH_TO_FX"] + "\n"
             )
             f = open("setvars.sh", "w")
             f.write(fileContent)
@@ -341,6 +385,7 @@ class TornadoInstaller:
 
         self.downloadCMake()
         self.downloadMaven()
+        self.downloadJavaFX()
 
         ## If JAVA_HOME is provided, there is no need to download a JDK
         if args.javaHome == None:

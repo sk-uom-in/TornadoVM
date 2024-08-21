@@ -67,6 +67,22 @@ MAVEN = {
     },
 }
 
+## JAVAFX
+JAVAFX = {
+    __LINUX__: {
+        __X86_64__: "https://download.java.net/java/GA/javafx21.0.2/0dc89a29ffa34addbe3057926acea09a/GPL/openjfx-21.0.2_linux-x64_bin-sdk.tar.gz",
+        __ARM__: None,
+    },
+    __APPLE__: {
+        __X86_64__: "https://download.java.net/java/GA/javafx21.0.2/0dc89a29ffa34addbe3057926acea09a/GPL/openjfx-21.0.2_macos-x64_bin-sdk.tar.gz",
+        __ARM__: "https://download.java.net/java/GA/javafx21.0.2/0dc89a29ffa34addbe3057926acea09a/GPL/openjfx-21.0.2_macos-aarch64_bin-sdk.tar.gz",
+    },
+    __WINDOWS__: {
+        __X86_64__: "https://download.java.net/java/GA/javafx21.0.2/0dc89a29ffa34addbe3057926acea09a/GPL/openjfx-21.0.2_windows-x64_bin-sdk.zip",
+        __ARM__: None,
+    },
+}
+
 ## JDK
 JDK = {
     __JDK21__: {

@@ -99,6 +99,14 @@ class TornadoVMRunnerTool():
             print("Please ensure the JAVA_HOME environment variable is set correctly")
             sys.exit(0)
 
+        try:
+            self.javafx = os.environ["PATH_TO_FX"]
+            if (platform.platform().startswith("MING")):
+                self.javafx = self.javafx.replace("\\", "/")
+        except:
+            print("Please ensure the PATH_TO_FX environment variable is set correctly")
+            sys.exit(0)
+
         env_vars = {
             "GRAALPY_HOME": "graalpy",
             "GRAALJS_HOME": "js",
@@ -242,6 +250,8 @@ class TornadoVMRunnerTool():
         else:
             tornadoFlags = tornadoFlags + " --module-path ." + os.pathsep + self.sdk + "/share/java/tornado"
 
+        tornadoFlags = tornadoFlags + "--module-path " + self.javafx
+
         if (args.module_path != None):
             tornadoFlags = tornadoFlags + ":" + args.module_path + " "
         else:
@@ -298,6 +308,8 @@ class TornadoVMRunnerTool():
                                                                                           "=") + ",tornado.examples"
         else:
             tornadoAddModules = __TORNADOVM_ADD_MODULES__
+
+        tornadoAddModules = tornadoAddModules + ",javafx.controls"
 
         javaFlags = ""
         if (args.enableAssertions):
