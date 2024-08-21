@@ -250,7 +250,7 @@ class TornadoVMRunnerTool():
         else:
             tornadoFlags = tornadoFlags + " --module-path ." + os.pathsep + self.sdk + "/share/java/tornado"
 
-        tornadoFlags = tornadoFlags + "--module-path " + self.javafx
+        tornadoFlags = tornadoFlags + ":" + self.javafx
 
         if (args.module_path != None):
             tornadoFlags = tornadoFlags + ":" + args.module_path + " "
@@ -309,8 +309,6 @@ class TornadoVMRunnerTool():
         else:
             tornadoAddModules = __TORNADOVM_ADD_MODULES__
 
-        tornadoAddModules = tornadoAddModules + ",javafx.controls"
-
         javaFlags = ""
         if (args.enableAssertions):
             javaFlags = javaFlags + __GRAAL_ENABLE_ASSERTIONS__
@@ -356,6 +354,8 @@ class TornadoVMRunnerTool():
             if ("ptx-backend" in self.listOfBackends):
                 javaFlags = javaFlags + "@" + ptx + " "
                 tornadoAddModules = tornadoAddModules + "," + __PTX_MODULE__
+
+            tornadoAddModules = tornadoAddModules + ",javafx.controls"
 
             javaFlags = javaFlags + tornadoAddModules + " "
 
